@@ -1,0 +1,8 @@
+interface:
+  display_name: "AI超市应用开发"
+  short_description: "先研究、再定义、再交付新的 AI 应用"
+  default_prompt: "Use $ai-supermarket-app-development to research similar products and open-source projects, clarify the product, read AIGZM requirements, and plan the build."
+
+policy:
+  allow_implicit_invocation: true
+
