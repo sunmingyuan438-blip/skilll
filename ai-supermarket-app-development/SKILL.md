@@ -104,11 +104,18 @@ description: "用于从零开发新的 AI 应用，尤其是计划接入或发�
 - 选择唯一身份模式：Developer API Key、OAuth 登录、OAuth + `points.spend` 或 OAuth + `billing.initiate`；
 - 文档真源顺序：`openapi.json`、实时模型文档、实时数据 API 文档、安全接入指南、官方示例；
 - 实时 `model_key`、数据 endpoint、调用入口、参数、积分、超时和幂等键策略；
+- 会员信息和钱包读取：`/v1/user/membership`、`/v1/user/membership/details`、`/v1/user/wallet`，以及禁止缓存、只能读取当前授权用户的限制；
+- 充值和会员购买：`POST /v1/user/billing-entries`、`GET /v1/user/billing-entries/{entry_id}`，回跳后仍必须查询 `payment_order.status=paid`；
+- AI 超市一次性购买：商业报价、公开详情和 `/v1/user/app-entitlement` 权益判断，Token 消耗单独计费；
 - API Key 激活、服务端密钥保存、鉴权头二选一、错误映射和余额不足处理；
 - OAuth PKCE、`state`、`nonce`、issuer/audience、`issuer + sub` 身份键和 Scope 最小化；
 - Sandbox 与生产隔离、OAuth 回调白名单、支付回跳白名单、Webhook 验签和 `event_id` 去重；
 - `billing_url` 只做浏览器跳转，支付成功以查询到 `payment_order.status=paid` 为准；
 - 数据 API 的动态目录、原样透传、`X-IdP-*` 计费/错误响应头和上游失败处理；
+- 应用托管：开通申请、套餐、`static_site`/`nodejs`/`python` 模板、zip 上传、构建、健康检查、回滚、空闲挂起和第三方出站网络放行；
+- 数据库：托管实例的 MySQL、容器内 `DATABASE_URL`、本机 `sql-query` 管理接口、查询超时/行数限制和迁移/seed 顺序；
+- 托管包和运行约束：20 MB zip、根目录入口、`PORT=8080`、只读文件系统、60 秒健康检查、10 秒 `SIGTERM` 和环境变量重新部署；
+- 托管环境变量导入：`AIGZM_CLIENT_ID`、`AIGZM_CLIENT_SECRET`、`AIGZM_REDIRECT_URI`、`AIGZM_BILLING_RETURN_URI`、`AIGZM_WEBHOOK_URL`、`AIGZM_WEBHOOK_SECRET`、`AIGZM_API_KEY`、`AIGZM_EXPECTED_ISSUER`，并记录 Secret/Key 轮换影响；
 - 不拉取、搜索、导出或关联全量会员、其他应用用户或跨应用身份；
 - API Key、Client Secret、Access Token、授权码和敏感输入不进入前端、URL、源码或日志；
 - 需要 AI 超市发布时，核对 Sandbox 基础接入、正式申请、`homepage_url`、应用状态、Scope、回调、Webhook 和审核影响。
@@ -144,6 +151,9 @@ description: "用于从零开发新的 AI 应用，尤其是计划接入或发�
 - AIGZM 请求严格依据官方 OpenAPI 和实时模型/数据 API 文档，不猜路径、不保存静态模型或接口白名单；
 - 只使用一种匹配的身份模式，凭据仅服务端保存；
 - 实现合适的超时、幂等键、错误映射、余额不足、上游故障、空结果和低置信度处理；
+- 会员、钱包、应用购买权益和支付状态以后端查询结果为准；Webhook 先验签、去重，再更新本地状态；
+- 托管部署包遵循对应模板的构建规则；数据库只使用 `DATABASE_URL` 或官方 SQL 管理接口，不把 SQLite、日志或上传文件写到持久本地磁盘；
+- 对托管实例唤醒期间的 `503`、`Retry-After` 和 `X-Idp-Wake-Page` 只重试幂等请求；
 - 保护用户数据，日志和错误上报做敏感字段脱敏；
 - 复用开源项目时记录仓库、版本、许可证、修改范围和履行义务；
 - Sandbox 和生产配置、数据、Webhook、凭据与日志隔离；
@@ -160,6 +170,8 @@ description: "用于从零开发新的 AI 应用，尤其是计划接入或发�
 - 单元/集成/构建/手工验收证据；
 - Sandbox 或正式联调证据（如适用）；
 - API、Webhook、计费、错误、超时和敏感数据检查结果；
+- 会员、钱包、应用权益、充值/会员购买和一次性应用购买检查结果；
+- 托管部署、回滚、环境变量、健康检查、空闲唤醒和 MySQL `DATABASE_URL` / SQL 管理检查结果；
 - 已知限制、许可证义务、未完成事项和下一步建议。
 
 至少核对 OpenAPI 契约、AIGZM Sandbox 成功/失败路径、幂等重试、余额不足、上游失败、Webhook 验签去重和敏感信息泄露风险。
@@ -171,6 +183,7 @@ description: "用于从零开发新的 AI 应用，尤其是计划接入或发�
 - `只看开源`：只扫描可复用仓库并检查许可证与部署条件；
 - `只看相似产品`：只扫描竞品、替代方案和用户反馈；
 - `重新读取 AIGZM 文档`：刷新官方开发者文档、实时模型和数据 API 索引；
+- `检查托管要求`：检查当前应用的模板、zip、环境变量、数据库、健康检查和部署约束；
 - `总结当前结论`：展示事实、假设和未知项；
 - `缩小 MVP`：重做 MUST/SHOULD/LATER/OUT；
 - `比较方案`：输出 2—3 个产品或技术方案；
